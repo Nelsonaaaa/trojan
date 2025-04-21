@@ -6,6 +6,8 @@
 # 日期: 2025-04-21                                                      #
 # 描述: 自动化部署 Trojan-Go 服务器，包括申请 SSL 证书、安装和配置        #
 #       Trojan-Go、设置伪装网站等                                        #
+# 执行脚本（需指定域名） ./trojan-go-install.sh --domain your-domain.com
+# 执行脚本（域名+自定义密码）./trojan-go-install.sh --domain your-domain.com --password your-password
 #########################################################################
 
 # 颜色定义
