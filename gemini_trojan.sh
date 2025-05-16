@@ -1,7 +1,3 @@
-Okay, this is an exciting step! Based on our detailed discussion and the finalized requirements, I will now construct the shell script.
-
-This will be a comprehensive script. I'll add comments to explain different sections and important commands.
-
 ```bash
 #!/bin/bash
 
