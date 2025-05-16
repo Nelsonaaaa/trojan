@@ -174,7 +174,7 @@ done
 
 log "Installing main dependencies: ufw, nginx, certbot, python3-certbot-nginx..."
 # Using DEBIAN_FRONTEND to avoid interactive prompts for Nginx, etc.
-DEBIAN_FRONTEND=noninteractive apt-get install -y ufw nginx certbot python3-certbot-nginx || error_exit "Failed to install main dependencies."
+DEBIAN_FRONTEND=noninteractive apt-get install -y ufw nginx certbot python3-certbot-nginx || error_exit "o install main dependencies."
 
 #-----------------------------
 # Enable BBR Congestion Control
@@ -225,9 +225,16 @@ log "Configuring firewall (UFW)..."
 ufw allow ssh || warn "Failed to allow SSH. Check UFW status."
 ufw allow http || warn "Failed to allow HTTP (80/tcp). Check UFW status."
 ufw allow https || warn "Failed to allow HTTPS (443/tcp). Check UFW status."
-yes | ufw enable || error_exit "Failed to enable UFW." # Use 'yes |' to auto-confirm
+# Check UFW status first
+if ! ufw status | grep -qw active; then
+    log "UFW is not active. Attempting to enable..."
+    yes | ufw enable || error_exit "Failed to enable UFW. 'ufw enable' command failed."
+    log "UFW has been enabled."
+else
+    log "UFW is already active."
+fi
 ufw status verbose
-log "UFW configured and enabled."
+log "UFW configuration complete." # Adjusted log message slightly
 
 #-----------------------------
 # Nginx Fallback Site Configuration
