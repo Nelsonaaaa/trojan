@@ -490,6 +490,8 @@ log " - SSL certificates are managed by Certbot and will auto-renew."
 log "   The renewal hook will automatically update Trojan-Go's certificates."
 log " - This installation log: $LOG_FILE"
 log ""
+
+<!--
 log "To Uninstall Trojan-Go (Manual Steps):"
 log "  1. Stop and disable the Trojan-Go service:"
 log "     sudo systemctl stop trojan-go"
@@ -511,6 +513,7 @@ log "     sudo certbot delete --cert-name $DOMAIN"
 log "  6. Clean apt packages (optional):"
 log "     sudo apt autoremove nginx trojan-go certbot python3-certbot-nginx ufw"
 log "==================================================================="
+-->
 
 exit 0
 ```
