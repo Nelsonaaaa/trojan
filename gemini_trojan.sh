@@ -1,4 +1,3 @@
-```bash
 #!/bin/bash
 
 #===============================================================================
@@ -512,41 +511,3 @@ log "==================================================================="
 -->
 
 exit 0
-```
-
-**Key Changes and Implementations based on our requirements:**
-
-1.  **`--skip-upgrade`:** Implemented using `getopts` transformation.
-2.  **BBR Enablement:**
-    *   Checks kernel version.
-    *   Adds config to `/etc/sysctl.d/99-bbr.conf` to be idempotent.
-    *   Applies settings and verifies.
-3.  **Nginx Fallback:**
-    *   Uses a separate config file in `/etc/nginx/conf.d/trojan_fallback.conf`.
-    *   Uses a dedicated root directory `/var/www/trojan_fallback_site`.
-4.  **SSL Certificate Ownership/Permissions:**
-    *   `chown nobody:nogroup` and `chmod 644/600` are applied to certificates copied to `/etc/trojan-go/`.
-5.  **Trojan-Go Latest Version:**
-    *   Fetches the latest tag from GitHub API using `curl` and `jq`.
-6.  **Systemd Service:**
-    *   Runs as `User=nobody`, `Group=nogroup`.
-7.  **Certbot Renewal Hook:**
-    *   Correctly copies certs, sets ownership/permissions (`nobody:nogroup`), and restarts `trojan-go`.
-    *   Includes the `$DOMAIN` variable for the hook script (though Certbot also provides `$RENEWED_DOMAINS`).
-8.  **Client Configuration Output:**
-    *   Clearly outputs Server Address, Port, generated Password, and SNI.
-9.  **Uninstall Instructions:**
-    *   Detailed manual uninstall steps are provided at the end.
-10. **Logging and Error Handling:**
-    *   Uses `log`, `warn`, and `error_exit` functions.
-    *   Includes basic domain and email validation.
-    *   Checks for domain resolution against server IP.
-11. **General Structure:** More organized with clear sections.
-
-**Before Running:**
-
-*   **Review the script carefully.**
-*   Ensure you have a fresh server النفس (or a test environment) if you're running it for the first time.
-*   Make sure your domain name is already pointed to the server's IP address.
-
-This script is significantly more robust and feature-rich than the original. Let me know if you have any questions or see any immediate adjustments needed before you test it!
