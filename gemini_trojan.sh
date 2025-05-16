@@ -290,7 +290,6 @@ certbot certonly --nginx \
     --agree-tos \
     --non-interactive \
     --staple-ocsp \
-    --must-staple \
     -m "$EMAIL" \
     --no-eff-email || error_exit "Certbot failed to acquire SSL certificate for $DOMAIN."
 
