@@ -510,4 +510,125 @@ log "     sudo apt autoremove nginx trojan-go certbot python3-certbot-nginx ufw"
 log "==================================================================="
 -->
 
+# Generate Clash client configuration
+CLIENT_PROXY_NAME="TrojanGo-${DOMAIN//./_}" # Create a somewhat unique name, replace dots with underscore
+CLASH_CONFIG_FILENAME="clash_config_${CLIENT_PROXY_NAME}.yaml" # Define the output filename
+
+log "Generating Clash Client Configuration file: $CLASH_CONFIG_FILENAME"
+log "-------------------------------------------------------------------"
+
+# Using a temporary variable for the heredoc content to make it cleaner.
+CLASH_CONFIG_CONTENT=$(cat << EOF
+port: 7890
+socks-port: 7891
+allow-lan: true
+bind-address: 0.0.0.0
+mode: rule
+log-level: warning
+external-controller: 127.0.0.1:9090
+ipv6: false
+
+dns:
+  enable: true
+  listen: 0.0.0.0:53
+  ipv6: false
+  enhanced-mode: fake-ip
+  default-nameserver:
+    - 223.5.5.5
+    - 8.8.8.8
+  nameserver:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+    - tls://dns.google
+  fallback:
+    - tls://1.1.1.1:853
+    - tls://8.8.4.4:853
+  fallback-filter:
+    geoip: true
+    geoip-code: CN
+
+proxies:
+    
+  - name: ${CLIENT_PROXY_NAME}
+    type: trojan
+    server: ${DOMAIN}
+    port: 443
+    password: "${TROJAN_PASSWORD}"
+    sni: ${DOMAIN}
+    skip-cert-verify: true # You had this as true, common for self-signed or quick setups. For LE, could be false.
+    udp: true
+    mtu: 1200
+
+proxy-groups:
+  - name: 😸Selections
+    type: select
+    proxies:
+      - ${CLIENT_PROXY_NAME}
+      - DIRECT
+
+rule-providers:
+  direct:
+    type: http
+    behavior: domain
+    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/direct.txt"
+    path: ./ruleset/direct.yaml
+    interval: 86400
+
+  reject:
+    type: http
+    behavior: domain
+    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/reject.txt"
+    path: ./ruleset/reject.yaml
+    interval: 86400
+
+  private:
+    type: http
+    behavior: domain
+    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/private.txt"
+    path: ./ruleset/private.yaml
+    interval: 86400
+
+  lancidr:
+    type: http
+    behavior: ipcidr
+    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/lancidr.txt"
+    path: ./ruleset/lancidr.yaml
+    interval: 86400
+
+  cncidr:
+    type: http
+    behavior: ipcidr
+    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/cncidr.txt"
+    path: ./ruleset/cncidr.yaml
+    interval: 86400
+
+rules:
+  - RULE-SET,private,DIRECT
+  - RULE-SET,lancidr,DIRECT
+  - RULE-SET,direct,DIRECT
+  - RULE-SET,cncidr,DIRECT
+  - RULE-SET,reject,REJECT
+  - GEOIP,CN,DIRECT
+  - MATCH,😸Selections
+EOF
+)
+
+# Save the generated config to a file in the current directory
+echo "$CLASH_CONFIG_CONTENT" > "./$CLASH_CONFIG_FILENAME"
+
+if [ $? -eq 0 ]; then
+    log "Clash client configuration successfully saved to: $(pwd)/$CLASH_CONFIG_FILENAME"
+else
+    warn "Failed to save Clash client configuration to a file. Please copy it manually from the log or console."
+fi
+log "-------------------------------------------------------------------"
+log "You can find the ready-to-use Clash configuration file at: $(pwd)/$CLASH_CONFIG_FILENAME"
+log ""
+
+
+log "To Uninstall Trojan-Go (Manual Steps):"
+log "  1. Stop and disable the Trojan-Go service:"
+# ... (rest of the uninstall instructions remain the same)
+log "==================================================================="
+
 exit 0
